@@ -60,8 +60,8 @@ export default function Page() {
       <header className="masthead">
         <h1 className="brand">vanillizator</h1>
         <p className="tagline">
-          paste anything. slide between a clean, professional rewrite and a 4am
-          crypto degen one. facts stay true, vibes do not.
+          paste anything. slide from clean copy to 4am crypto degen. same
+          facts, opposite vibes.
         </p>
       </header>
 
@@ -173,11 +173,18 @@ function blend(vanilla: string, unhinged: string, p: number): string {
   const u = unhinged.split(/(\s+)/);
   const len = Math.round(v.length + (u.length - v.length) * p);
 
+  // Perceptual easing: each unhinged token carries more "chaos signal"
+  // than each vanilla token carries "order signal", so a linear mix reads
+  // as mostly-degen well before 50%. Raising p to a power > 1 dials the
+  // mid-range back so 50% on the slider feels like a true halfway, while
+  // 100% still lands on full unhinged.
+  const eased = Math.pow(p, 1.55);
+
   const PHI = 0.6180339887498949;
   const out: string[] = [];
   for (let i = 0; i < len; i++) {
     const r = (i * PHI) % 1; // evenly distributed in [0,1)
-    const fromUnhinged = r < p;
+    const fromUnhinged = r < eased;
     const src = fromUnhinged ? u : v;
     // map output index into the source array proportionally so we don't run off the end
     const idx = Math.min(src.length - 1, Math.round((i / Math.max(1, len - 1)) * (src.length - 1)));

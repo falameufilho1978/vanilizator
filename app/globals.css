@@ -76,7 +76,9 @@ body {
   font-family: var(--display);
   font-size: clamp(64px, 12vw, 140px);
   font-weight: 400;
-  letter-spacing: -0.01em;
+  /* Small positive tracking so the double-L in "vanillizator" articulates
+     as two distinct loops in Pacifico's heavily-connected script. */
+  letter-spacing: 0.015em;
   margin: 0;
   line-height: 0.92;
   color: var(--cream-white);
