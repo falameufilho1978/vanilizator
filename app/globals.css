@@ -1,29 +1,31 @@
 :root {
-  /* Cream surface — porcelain/oat cream, not custard.
-     Pulled chroma down from yellow toward neutral. */
-  --bg: #ece5d6;
-  --panel: #f6f1e4;
-  --panel-soft: #efeada;
-  --line: #d4cab2;
-  --line-soft: #dfd6c0;
+  /* Surface — warm near-neutral, in the Claude / ChatGPT register but
+     leaning slightly cream so the brand mark feels at home. */
+  --bg: #f7f3e9;
+  --panel: #ffffff;
+  --panel-tint: #fbf8ef;
+  --line: #e7e0cf;
+  --line-soft: #efe9dc;
+  --line-strong: #d4c8b3;
 
-  /* Ink — warm cocoa, never pure black */
-  --ink: #322317;
-  --ink-soft: #5e4632;
-  --muted: #8a7458;
-  --faint: #b1997a;
+  /* Ink */
+  --ink: #2a221c;
+  --ink-soft: #5a4f47;
+  --muted: #857a72;
+  --faint: #b5aca5;
 
-  /* "Whitish over white" — softer porcelain cream for the brand */
-  --cream-white: #f9f5ea;
-  --cream-glow: #fbf8ef;
+  /* Brand fill — keep porcelain cream for the wordmark */
+  --cream-white: #fbf6e9;
 
-  /* Accent — candle-label burgundy + caramel heat for active states */
+  /* Accents */
   --accent: #6b1f26;
-  --accent-warm: #862931;
+  --cocoa: #1f1812;
+  --cocoa-hover: #2d241c;
   --caramel: #c08148;
   --caramel-deep: #855526;
 
-  --radius: 14px;
+  --radius-card: 20px;
+  --radius-chip: 999px;
 
   --display: var(--font-display), "Pacifico", "Snell Roundhand", cursive;
   --body: var(--font-geist-sans), -apple-system, BlinkMacSystemFont, "Inter",
@@ -50,40 +52,39 @@ body {
 }
 
 body {
-  background-image:
-    radial-gradient(1100px 700px at 88% -10%, rgba(244, 238, 224, 0.85), transparent 62%),
-    radial-gradient(800px 500px at -10% 110%, rgba(214, 192, 152, 0.22), transparent 60%);
   min-height: 100vh;
 }
 
-.wrap {
-  max-width: 920px;
+.app {
+  max-width: 760px;
   margin: 0 auto;
-  padding: 64px 28px 96px;
-}
-
-/* ---- masthead — left aligned, brand then tagline beneath ---- */
-.masthead {
+  padding: 56px 24px 64px;
   display: flex;
   flex-direction: column;
-  align-items: flex-start;
-  gap: 18px;
-  border-bottom: 1px solid var(--line);
-  padding-bottom: 36px;
+  gap: 32px;
+}
+
+/* ---- hero (brand + tagline, centered) ---- */
+.hero {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: 14px;
+  padding: 8px 0 4px;
 }
 
 .brand {
   font-family: var(--display);
-  font-size: clamp(64px, 12vw, 140px);
+  font-size: clamp(56px, 9vw, 104px);
   font-weight: 400;
-  /* Small positive tracking so the double-L in "vanillizator" articulates
-     as two distinct loops in Pacifico's heavily-connected script. */
+  /* Positive tracking so the double-L articulates in Pacifico's script. */
   letter-spacing: 0.015em;
   margin: 0;
-  line-height: 0.92;
+  line-height: 0.95;
   color: var(--cream-white);
-  /* solid cream fill + stacked cocoa drop-shadow extrude.
-     no gradient text — layered shadows only. */
+  /* Cream-on-near-white extrude — the brand keeps its dimensional candy
+     identity even on the cooler product surface. */
   text-shadow:
     1px 1px 0 #e0d4b4,
     2px 2px 0 #cebd95,
@@ -98,160 +99,192 @@ body {
 
 .tagline {
   color: var(--ink-soft);
-  font-family: var(--body);
-  font-size: 16px;
-  max-width: 480px;
+  font-size: 15px;
+  max-width: 460px;
   line-height: 1.5;
   margin: 0;
   letter-spacing: -0.005em;
 }
 
-/* ---- labels (per-item, bracketed Sentence-case) ---- */
-.label {
-  font-family: var(--body);
-  font-size: 12px;
-  letter-spacing: 0.01em;
-  color: var(--muted);
-  text-transform: none;
-}
-.label::before {
-  content: "[ ";
-  color: var(--accent);
-}
-.label::after {
-  content: " ]";
-  color: var(--accent);
-}
-
-/* ---- input ---- */
-.row {
-  margin-top: 36px;
-}
-
-textarea {
-  display: block;
+/* ---- composer (Claude-ish: card + embedded send arrow) ---- */
+.composer-wrap {
   width: 100%;
-  min-height: 164px;
-  resize: vertical;
-  margin-top: 10px;
-  padding: 16px 18px;
+}
+
+.composer {
   background: var(--panel);
   border: 1px solid var(--line);
-  border-radius: var(--radius);
-  color: var(--ink);
+  border-radius: var(--radius-card);
+  padding: 16px 18px 12px;
+  box-shadow: 0 6px 28px rgba(45, 27, 16, 0.04);
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+.composer:focus-within {
+  border-color: var(--line-strong);
+  box-shadow: 0 6px 28px rgba(45, 27, 16, 0.08);
+}
+
+.composer textarea {
+  width: 100%;
+  border: none;
+  outline: none;
+  background: transparent;
+  resize: none;
   font-family: var(--body);
   font-size: 16px;
   line-height: 1.55;
   letter-spacing: -0.005em;
-  outline: none;
-  transition: border-color 0.18s ease, box-shadow 0.18s ease;
-  box-shadow: inset 0 1px 2px rgba(60, 42, 28, 0.04);
+  padding: 4px 0 0;
+  min-height: 72px;
+  max-height: 320px;
+  color: var(--ink);
 }
-textarea:focus {
-  border-color: var(--caramel);
-  box-shadow:
-    inset 0 1px 2px rgba(60, 42, 28, 0.04),
-    0 0 0 4px rgba(192, 129, 72, 0.18);
-}
-textarea::placeholder {
+.composer textarea::placeholder {
   color: var(--faint);
 }
 
-.controls {
+.composer-bottom {
   display: flex;
+  justify-content: space-between;
   align-items: center;
-  gap: 16px;
-  flex-wrap: wrap;
-  margin-top: 16px;
+  margin-top: 10px;
+  gap: 12px;
 }
 
-/* CTA — chocolate-on-cream, sans, the "chocolate-dipped vanilla" pairing.
-   Cohesive with the cocoa drop-shadow extrude on the brand wordmark. */
-button.go {
-  appearance: none;
-  border: none;
-  cursor: pointer;
-  background: linear-gradient(180deg, #4a2e1c 0%, #2d1b10 100%);
-  color: var(--cream-white);
-  font-family: var(--body);
-  font-weight: 600;
-  font-size: 15px;
-  letter-spacing: -0.003em;
-  padding: 12px 26px 13px;
-  border-radius: 999px;
-  box-shadow:
-    0 1px 0 rgba(255, 255, 255, 0.18) inset,
-    0 -2px 0 rgba(0, 0, 0, 0.18) inset,
-    0 6px 18px rgba(45, 27, 16, 0.32);
-  transition: transform 0.08s ease, filter 0.15s ease, opacity 0.15s ease;
-}
-button.go:hover:not(:disabled) {
-  filter: brightness(1.06);
-}
-button.go:active:not(:disabled) {
-  transform: translateY(1px);
-}
-button.go:disabled {
-  opacity: 0.45;
-  cursor: not-allowed;
+.composer-right {
+  display: flex;
+  align-items: center;
+  gap: 12px;
 }
 
 .count {
-  font-family: var(--body);
-  font-size: 12px;
+  font-size: 11px;
   color: var(--faint);
   letter-spacing: 0;
+  font-variant-numeric: tabular-nums;
 }
 
-.err {
-  margin-top: 14px;
-  padding: 12px 16px;
-  border: 1px solid rgba(107, 31, 38, 0.32);
-  background: rgba(140, 49, 56, 0.06);
-  color: var(--accent);
-  border-radius: 12px;
-  font-size: 13px;
-  font-family: var(--body);
+.send {
+  appearance: none;
+  border: none;
+  cursor: pointer;
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  background: var(--cocoa);
+  color: var(--cream-white);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.15s ease, opacity 0.15s ease, transform 0.08s ease;
+}
+.send:hover:not(:disabled) {
+  background: var(--cocoa-hover);
+}
+.send:active:not(:disabled) {
+  transform: scale(0.96);
+}
+.send:disabled {
+  background: var(--line-soft);
+  color: var(--faint);
+  cursor: not-allowed;
 }
 
-/* ---- blender ---- */
-.blender {
-  margin-top: 44px;
-  border: 1px solid var(--line);
-  border-radius: var(--radius);
+/* ---- chips (uniform pill base) ---- */
+.chip {
+  appearance: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  height: 34px;
+  padding: 0 14px;
   background: var(--panel);
-  padding: 28px 28px 30px;
-  box-shadow:
-    0 1px 0 rgba(255, 255, 255, 0.7) inset,
-    inset 0 1px 2px rgba(60, 42, 28, 0.04);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-chip);
+  font-family: var(--body);
+  font-size: 12px;
+  letter-spacing: -0.003em;
+  color: var(--muted);
+  cursor: pointer;
+  transition: border-color 0.15s ease, color 0.15s ease, background 0.15s ease;
 }
-.blender[data-empty="true"] {
-  opacity: 0.78;
+.chip:hover:not(:disabled) {
+  border-color: var(--line-strong);
+  color: var(--ink);
+}
+.chip:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
 }
 
-.sliderhead {
+.chip.ghost {
+  background: transparent;
+}
+
+/* ---- result block ---- */
+.result {
   display: flex;
-  justify-content: space-between;
-  font-family: var(--body);
-  font-size: 13px;
-  letter-spacing: 0.005em;
+  flex-direction: column;
+  gap: 14px;
 }
-.sliderhead .l {
+
+.output-card {
+  background: var(--panel-tint);
+  border: 1px solid var(--line-soft);
+  border-radius: var(--radius-card);
+  padding: 22px 24px 24px;
+}
+
+.output-label {
+  display: inline-block;
+  font-size: 10.5px;
+  font-weight: 500;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
   color: var(--muted);
+  margin-bottom: 14px;
+  padding: 4px 10px;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  background: var(--panel);
 }
-.sliderhead .r {
-  color: var(--caramel-deep);
+
+.output-text {
+  font-size: 17px;
+  line-height: 1.6;
+  letter-spacing: -0.005em;
+  color: var(--ink);
+  white-space: pre-wrap;
+  word-wrap: break-word;
 }
-.sliderhead .l[data-active="true"] {
+
+.controls-row {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  align-items: center;
+}
+
+/* ---- slider chip ---- */
+.slider-chip {
+  gap: 14px;
+  padding: 0 14px;
+}
+.slider-chip .lbl {
+  font-size: 12px;
+  color: var(--muted);
+  letter-spacing: -0.003em;
+  transition: color 0.15s;
+}
+.slider-chip .lbl[data-active="true"] {
   color: var(--ink);
 }
 
-input[type="range"] {
+.slider-chip input[type="range"] {
   -webkit-appearance: none;
   appearance: none;
-  width: 100%;
-  height: 8px;
-  margin: 16px 0 6px;
+  width: 140px;
+  height: 5px;
   border-radius: 999px;
   background: linear-gradient(
     90deg,
@@ -262,152 +295,91 @@ input[type="range"] {
   );
   outline: none;
   cursor: pointer;
-  border: 1px solid var(--line);
-  box-shadow: inset 0 1px 2px rgba(60, 42, 28, 0.08);
+  border: none;
+  padding: 0;
 }
-input[type="range"]::-webkit-slider-thumb {
+.slider-chip input[type="range"]::-webkit-slider-thumb {
   -webkit-appearance: none;
   appearance: none;
-  width: 24px;
-  height: 24px;
+  width: 16px;
+  height: 16px;
   border-radius: 50%;
-  background: radial-gradient(
-    circle at 36% 28%,
-    #ffffff 0%,
-    var(--cream-white) 32%,
-    #e5d8bb 78%,
-    #c8b48e 100%
-  );
+  background: var(--cream-white);
   border: 2px solid var(--caramel-deep);
-  box-shadow: 0 2px 6px rgba(60, 42, 28, 0.25);
+  box-shadow: 0 1px 3px rgba(60, 42, 28, 0.22);
 }
-input[type="range"]::-moz-range-thumb {
-  width: 24px;
-  height: 24px;
+.slider-chip input[type="range"]::-moz-range-thumb {
+  width: 16px;
+  height: 16px;
   border-radius: 50%;
-  background: var(--cream-glow);
+  background: var(--cream-white);
   border: 2px solid var(--caramel-deep);
 }
 
-.pctline {
-  font-family: var(--body);
-  font-size: 12px;
-  color: var(--muted);
-  margin-top: 4px;
-  letter-spacing: 0;
+/* ---- toggle chip ---- */
+.toggle-chip {
+  padding-left: 10px;
 }
-.pctline b {
-  color: var(--caramel-deep);
-  font-weight: 600;
-}
-
-/* ---- toggle ---- */
-.toggle {
-  margin-top: 22px;
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  user-select: none;
-  cursor: pointer;
-  font-family: var(--body);
-  font-size: 13px;
-  color: var(--muted);
-  letter-spacing: 0;
-}
-.switch {
-  width: 42px;
-  height: 24px;
+.toggle-chip .switch {
+  display: inline-block;
+  width: 26px;
+  height: 16px;
   border-radius: 999px;
   background: var(--line);
   position: relative;
-  transition: background 0.18s ease;
   flex: none;
-  box-shadow: inset 0 1px 2px rgba(60, 42, 28, 0.18);
+  transition: background 0.18s ease;
 }
-.switch[data-on="true"] {
-  background: linear-gradient(180deg, var(--caramel) 0%, var(--caramel-deep) 100%);
+.toggle-chip[data-on="true"] .switch {
+  background: linear-gradient(180deg, var(--caramel), var(--caramel-deep));
 }
-.switch i {
+.toggle-chip .switch i {
   position: absolute;
-  top: 3px;
-  left: 3px;
-  width: 18px;
-  height: 18px;
+  top: 2px;
+  left: 2px;
+  width: 12px;
+  height: 12px;
   border-radius: 50%;
-  background: var(--cream-glow);
+  background: var(--panel);
   transition: transform 0.18s ease;
   box-shadow: 0 1px 2px rgba(60, 42, 28, 0.22);
 }
-.switch[data-on="true"] i {
-  transform: translateX(18px);
+.toggle-chip[data-on="true"] .switch i {
+  transform: translateX(10px);
 }
-.toggle b {
-  color: var(--ink);
-  font-weight: 600;
-}
-
-/* ---- output ---- */
-.output {
-  margin-top: 24px;
-  padding-top: 22px;
-  border-top: 1px solid var(--line-soft);
-  font-family: var(--body);
-  font-size: 17px;
-  line-height: 1.6;
-  letter-spacing: -0.005em;
-  white-space: pre-wrap;
-  word-wrap: break-word;
-  min-height: 60px;
+.toggle-chip[data-on="true"] {
   color: var(--ink);
 }
-.output[data-empty="true"] {
-  color: var(--faint);
+
+/* ---- error ---- */
+.err {
+  margin-top: 12px;
+  padding: 10px 14px;
+  border: 1px solid rgba(107, 31, 38, 0.3);
+  background: rgba(140, 49, 56, 0.06);
+  color: var(--accent);
+  border-radius: 12px;
+  font-size: 13px;
 }
 
-.copybar {
-  margin-top: 20px;
-  display: flex;
-  gap: 10px;
-}
-
-button.ghost {
-  appearance: none;
-  cursor: pointer;
-  background: transparent;
-  border: 1px solid var(--line);
-  color: var(--muted);
-  font-family: var(--body);
-  font-size: 12px;
-  padding: 8px 14px;
-  border-radius: 999px;
-  letter-spacing: 0;
-  transition: border-color 0.15s ease, color 0.15s ease, background 0.15s ease;
-}
-button.ghost:hover {
-  border-color: var(--caramel);
-  color: var(--ink);
-  background: rgba(251, 248, 239, 0.5);
-}
-
+/* ---- footer ---- */
 .foot {
-  margin-top: 64px;
-  text-align: left;
-  font-family: var(--body);
+  text-align: center;
   font-size: 12px;
   color: var(--faint);
+  margin: 16px 0 0;
   letter-spacing: 0;
 }
 
+/* ---- spinner ---- */
 .spin {
   display: inline-block;
   width: 12px;
   height: 12px;
-  border: 2px solid rgba(249, 245, 234, 0.35);
+  border: 2px solid rgba(251, 246, 233, 0.35);
   border-top-color: var(--cream-white);
   border-radius: 50%;
   animation: spin 0.7s linear infinite;
-  vertical-align: -1px;
-  margin-right: 8px;
 }
 @keyframes spin {
   to {
@@ -416,13 +388,21 @@ button.ghost:hover {
 }
 
 @media (max-width: 640px) {
-  .wrap {
-    padding: 44px 20px 80px;
+  .app {
+    padding: 40px 18px 56px;
+    gap: 26px;
   }
-  .masthead {
-    padding-bottom: 28px;
+  .hero {
+    padding-top: 4px;
   }
-  .blender {
-    padding: 22px 22px 26px;
+  .composer {
+    padding: 14px 16px 12px;
+  }
+  .slider-chip {
+    flex: 1 1 100%;
+    justify-content: space-between;
+  }
+  .slider-chip input[type="range"] {
+    width: 120px;
   }
 }
