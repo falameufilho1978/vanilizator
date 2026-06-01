@@ -58,12 +58,10 @@ export default function Page() {
   return (
     <main className="wrap">
       <header className="masthead">
-        <h1 className="brand">
-          vanil<b>izator</b>
-        </h1>
+        <h1 className="brand">vanilizator</h1>
         <p className="tagline">
           paste anything. slide between a clean, professional rewrite and a 4am
-          crypto degen rewrite. facts stay true, vibes do not.
+          crypto degen one. facts stay true, vibes do not.
         </p>
       </header>
 
@@ -72,7 +70,7 @@ export default function Page() {
         <textarea
           value={text}
           onChange={(e) => setText(e.target.value)}
-          placeholder="Paste a tweet, an announcement, a whitepaper paragraph..."
+          placeholder="paste a tweet, an announcement, a whitepaper paragraph, a press release..."
           maxLength={6000}
         />
         <div className="controls" style={{ marginTop: 14 }}>
@@ -156,7 +154,9 @@ export default function Page() {
         )}
       </section>
 
-      <p className="foot">vanilizator · powered by claude haiku · ngmi otherwise</p>
+      <p className="foot">
+        100% soy wax. side effects may include irreversibly going full degen.
+      </p>
     </main>
   );
 }
