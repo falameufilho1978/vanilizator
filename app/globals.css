@@ -165,26 +165,25 @@ textarea::placeholder {
   margin-top: 16px;
 }
 
-/* CTA — the ONE serif element on the page */
+/* CTA — chocolate-on-cream, sans, the "chocolate-dipped vanilla" pairing.
+   Cohesive with the cocoa drop-shadow extrude on the brand wordmark. */
 button.go {
   appearance: none;
   border: none;
   cursor: pointer;
-  background: linear-gradient(180deg, #862931 0%, #6b1f26 100%);
+  background: linear-gradient(180deg, #4a2e1c 0%, #2d1b10 100%);
   color: var(--cream-white);
-  font-family: var(--serif);
-  font-style: italic;
+  font-family: var(--body);
   font-weight: 600;
-  font-size: 18px;
-  letter-spacing: 0;
-  padding: 13px 28px 14px;
+  font-size: 15px;
+  letter-spacing: -0.003em;
+  padding: 12px 26px 13px;
   border-radius: 999px;
   box-shadow:
-    0 1px 0 rgba(255, 255, 255, 0.22) inset,
-    0 -2px 0 rgba(0, 0, 0, 0.14) inset,
-    0 6px 18px rgba(107, 31, 38, 0.28);
+    0 1px 0 rgba(255, 255, 255, 0.18) inset,
+    0 -2px 0 rgba(0, 0, 0, 0.18) inset,
+    0 6px 18px rgba(45, 27, 16, 0.32);
   transition: transform 0.08s ease, filter 0.15s ease, opacity 0.15s ease;
-  font-variation-settings: "opsz" 18, "SOFT" 100;
 }
 button.go:hover:not(:disabled) {
   filter: brightness(1.06);
