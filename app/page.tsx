@@ -58,7 +58,7 @@ export default function Page() {
   return (
     <main className="wrap">
       <header className="masthead">
-        <h1 className="brand">vanilizator</h1>
+        <h1 className="brand">vanillizator</h1>
         <p className="tagline">
           paste anything. slide between a clean, professional rewrite and a 4am
           crypto degen one. facts stay true, vibes do not.
@@ -154,9 +154,7 @@ export default function Page() {
         )}
       </section>
 
-      <p className="foot">
-        100% soy wax. side effects may include irreversibly going full degen.
-      </p>
+      <p className="foot">Vanillizator by Mascarenhas Productions LLC</p>
     </main>
   );
 }

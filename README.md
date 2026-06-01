@@ -1,4 +1,4 @@
-# vanilizator
+# vanillizator
 
 A crypto text tool. Paste any text, hit **vanilize**, and the app returns two rewrites of the same content:
 

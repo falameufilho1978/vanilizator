@@ -8,7 +8,7 @@ export const dynamic = "force-dynamic";
 const MODEL = "claude-haiku-4-5";
 const MAX_INPUT_CHARS = 6000;
 
-const SYSTEM_PROMPT = `You are vanilizator, a crypto text engine. You take a user's input and return TWO rewrites of the same content as JSON.
+const SYSTEM_PROMPT = `You are vanillizator, a crypto text engine. You take a user's input and return TWO rewrites of the same content as JSON.
 
 Return ONLY a single JSON object, no prose, no markdown fences, with exactly these keys:
 {
