@@ -235,6 +235,14 @@ body {
   padding: 22px 24px 24px;
 }
 
+.output-labels {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 14px;
+  flex-wrap: wrap;
+}
+
 .output-label {
   display: inline-block;
   font-size: 10.5px;
@@ -242,11 +250,33 @@ body {
   letter-spacing: 0.06em;
   text-transform: uppercase;
   color: var(--muted);
-  margin-bottom: 14px;
   padding: 4px 10px;
   border: 1px solid var(--line);
   border-radius: 999px;
   background: var(--panel);
+}
+
+/* Live vibe pill — caramel accent so it reads as the dynamic counterpart
+   to the static VANILLIZED tag. Updates as the slider moves. */
+.vibe-label {
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+  font-size: 10.5px;
+  font-weight: 500;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--caramel-deep);
+  padding: 4px 10px;
+  border: 1px solid rgba(192, 129, 72, 0.4);
+  background: rgba(192, 129, 72, 0.08);
+  border-radius: 999px;
+  font-variant-numeric: tabular-nums;
+}
+.vibe-label .dot {
+  color: rgba(133, 85, 38, 0.5);
+  margin: 0 4px;
+  letter-spacing: 0;
 }
 
 .output-text {

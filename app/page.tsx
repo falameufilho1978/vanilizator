@@ -7,6 +7,38 @@ type Result = { vanilla: string; unhinged: string };
 const SAMPLE =
   "We're excited to announce that our protocol has completed its security audit and will launch its mainnet next quarter. Staking rewards begin at launch.";
 
+// Vibe ladder. 17 distinct tiers so the label visibly changes as the user
+// drags the slider (~every 5–7 units). Arc: corporate/formal at the bottom,
+// online-casual in the middle, crypto-online → degen at the top. Dessert
+// metaphors (toasted / caramelized) thread through the middle as a callback
+// to the brand. Default 50% lands exactly on "Caramelized".
+const INTENSITY_LEVELS: ReadonlyArray<{ at: number; name: string }> = [
+  { at: 0, name: "Pure vanilla" },
+  { at: 1, name: "Boardroom" },
+  { at: 8, name: "Press release" },
+  { at: 15, name: "LinkedIn" },
+  { at: 22, name: "Casual Friday" },
+  { at: 30, name: "Group chat" },
+  { at: 37, name: "Lightly toasted" },
+  { at: 44, name: "Quote tweet" },
+  { at: 50, name: "Caramelized" },
+  { at: 57, name: "Locked in" },
+  { at: 64, name: "Crypto Twitter" },
+  { at: 71, name: "Reply guy" },
+  { at: 78, name: "Down bad" },
+  { at: 84, name: "Posting through it" },
+  { at: 90, name: "WAGMI delirium" },
+  { at: 96, name: "Terminally online" },
+  { at: 100, name: "Unhinged AF" },
+];
+
+function vibeFor(n: number): string {
+  for (let i = INTENSITY_LEVELS.length - 1; i >= 0; i--) {
+    if (n >= INTENSITY_LEVELS[i].at) return INTENSITY_LEVELS[i].name;
+  }
+  return INTENSITY_LEVELS[0].name;
+}
+
 export default function Page() {
   const [text, setText] = useState("");
   const [result, setResult] = useState<Result | null>(null);
@@ -110,7 +142,12 @@ export default function Page() {
       {result && (
         <section className="result">
           <div className="output-card">
-            <span className="output-label">Vanillized</span>
+            <div className="output-labels">
+              <span className="output-label">Vanillized</span>
+              <span className="vibe-label" aria-live="polite">
+                {vibeFor(intensity)} <span className="dot">·</span> {intensity}%
+              </span>
+            </div>
             <div className="output-text">{blended}</div>
           </div>
 
