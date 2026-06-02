@@ -5,8 +5,15 @@ import { useMemo, useState } from "react";
 type Version = { at: number; text: string };
 type Result = { versions: Version[] };
 
-const SAMPLE =
-  "We're excited to announce that our protocol has completed its security audit and will launch its mainnet next quarter. Staking rewards begin at launch.";
+// Four sample types covering the most common crypto comms archetypes. The
+// "Try a sample" button cycles through them in order so users can see how
+// the vibe ladder handles different content shapes.
+const SAMPLES: ReadonlyArray<string> = [
+  "We're excited to announce that our protocol has completed its security audit and will launch its mainnet next quarter. Staking rewards begin at launch.",
+  "Today we're announcing our $40M Series A led by Paradigm, with participation from a16z and Polychain. The funds will accelerate our roadmap and grow the team.",
+  "Eligible testnet participants will receive a token airdrop on March 15. Check your wallet on the claim page to see if you qualify.",
+  "We're pleased to share a strategic partnership with Chainlink to integrate decentralized oracles into our protocol's pricing layer, going live in Q2.",
+];
 
 // Vibe ladder. 17 distinct tiers so the label visibly changes as the user
 // drags the slider (~every 5–7 units). Arc: corporate/formal at the bottom,
@@ -49,6 +56,12 @@ export default function Page() {
   const [intensity, setIntensity] = useState(50);
   const [killDashes, setKillDashes] = useState(true);
   const [copied, setCopied] = useState(false);
+  const [sampleIdx, setSampleIdx] = useState(0);
+
+  function nextSample() {
+    setText(SAMPLES[sampleIdx]);
+    setSampleIdx((i) => (i + 1) % SAMPLES.length);
+  }
 
   async function transform() {
     setLoading(true);
@@ -121,10 +134,11 @@ export default function Page() {
             <button
               type="button"
               className="chip ghost"
-              onClick={() => setText(SAMPLE)}
+              onClick={nextSample}
               disabled={loading}
+              title={`Sample ${sampleIdx + 1} of ${SAMPLES.length}`}
             >
-              Try a sample
+              {sampleIdx === 0 ? "Try a sample" : "Try another"}
             </button>
             <div className="composer-right">
               <span className="count">{text.length}/6000</span>

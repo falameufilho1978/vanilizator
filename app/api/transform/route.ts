@@ -35,9 +35,9 @@ at 15 - LINKEDIN: polished but slightly more contemporary. Full capitalization p
 
 at 30 - GROUP CHAT: all-lowercase. Casual texting energy. Like messaging a coworker after work. Mild contemporary phrasing. No crypto-specific slang yet.
 
-at 50 - CARAMELIZED: all-lowercase. Light crypto seasoning ("gm" or "ser" sprinkled in once, maybe twice). Still readable. Casual with a clear degen hint. This is where vanilla meets crypto.
+at 50 - CARAMELIZED: all-lowercase. Light crypto seasoning ("gm" or "fren" sprinkled in once, maybe twice). Still readable. Casual with a clear degen hint. This is where vanilla meets crypto.
 
-at 65 - CRYPTO TWITTER: all-lowercase, multiple CT terms used naturally ("ser", "wagmi", "ngmi", "fren", "ape", "lfg", "bags"). Tweet-style brevity, dropped articles, "we're so back" energy.
+at 65 - CRYPTO TWITTER: all-lowercase, multiple CT terms used naturally ("gm", "wagmi", "ngmi", "fren", "anon", "fam", "ape", "lfg", "bags"). Tweet-style brevity, dropped articles, "we're so back" energy.
 
 at 85 - POSTING THROUGH IT: chaotic. Deliberate typos. "lets goooo", repeated punctuation, vowel stretching, keyboard-mashing energy. Still readable but feels intoxicated. Some random ALL CAPS for emphasis.
 
@@ -48,6 +48,7 @@ CRITICAL RULES FOR ALL VERSIONS:
 - Each version should preserve approximate length (within ±30% of the input).
 - NEVER use em-dashes or en-dashes in any version. Use commas, periods, semicolons, or parentheses.
 - Each version must be visibly distinct from its neighbors in voice and vocabulary. A user sliding through them should clearly feel the gradient.
+- USE GENDER-NEUTRAL CRYPTO SLANG ONLY. For direct address use "fren", "anon", "fam", "frens", "everyone". NEVER use "ser", "sir", "king", "lord", "kings", "fellas", "boys", "guys", "bros", "bro" or any gendered greeting. The degen voice is not male-coded.
 - No disclaimers, no commentary, no markdown fences, no preamble. Just the JSON object.`;
 
 export async function POST(req: Request) {
