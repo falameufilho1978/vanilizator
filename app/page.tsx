@@ -2,7 +2,8 @@
 
 import { useMemo, useState } from "react";
 
-type Result = { vanilla: string; unhinged: string };
+type Version = { at: number; text: string };
+type Result = { versions: Version[] };
 
 const SAMPLE =
   "We're excited to announce that our protocol has completed its security audit and will launch its mainnet next quarter. Staking rewards begin at launch.";
@@ -61,7 +62,10 @@ export default function Page() {
       });
       const data = await res.json();
       if (!res.ok) throw new Error(data?.error || "Request failed.");
-      setResult({ vanilla: data.vanilla, unhinged: data.unhinged });
+      if (!Array.isArray(data?.versions) || data.versions.length === 0) {
+        throw new Error("The response was missing voice variants.");
+      }
+      setResult({ versions: data.versions });
     } catch (e) {
       setError(e instanceof Error ? e.message : "Something went wrong.");
       setResult(null);
@@ -72,7 +76,7 @@ export default function Page() {
 
   const blended = useMemo(() => {
     if (!result) return "";
-    const out = blend(result.vanilla, result.unhinged, intensity / 100);
+    const out = blendAcrossAnchors(result.versions, intensity);
     return killDashes ? stripDashes(out) : out;
   }, [result, intensity, killDashes]);
 
@@ -212,24 +216,68 @@ function ArrowIcon() {
 }
 
 /**
- * Sentence-level blend with perceptual easing. See engineering notes in
- * previous version: word-interleave produced repeated words; switching to
- * sentence-level eliminates that. p^2 easing pushes 50% slider toward ~25%
- * unhinged sentences so the middle reads vanilla-with-a-tinge.
+ * Find the two anchors that bracket the slider position, then sentence-blend
+ * between them at the local fraction. With 7 anchors spread across 0–100,
+ * each slider region (e.g. 30–50) interpolates between two semantically
+ * adjacent voices — every drag produces visibly different text.
+ *
+ * Why no power easing here: the anchors are already spaced semantically
+ * (Pure vanilla → LinkedIn → Group chat → Caramelized → Crypto Twitter →
+ * Posting through it → Unhinged AF). The slider is doing local interpolation
+ * inside each pair, so a linear fraction reads honestly. The "feels too
+ * crazy at 50%" problem the old curve solved is dead — at 50% the slider
+ * now lands ON an anchor ("Caramelized"), so what you see is exactly the
+ * model's mid-tier voice, not a vanilla/unhinged interpolation.
  */
-function blend(vanilla: string, unhinged: string, p: number): string {
-  if (p <= 0) return vanilla;
-  if (p >= 1) return unhinged;
-  const eased = p * p;
-  const vSents = splitSentences(vanilla);
-  const uSents = splitSentences(unhinged);
-  const n = Math.max(vSents.length, uSents.length);
+function blendAcrossAnchors(versions: Version[], intensity: number): string {
+  if (versions.length === 0) return "";
+  if (versions.length === 1) return versions[0].text;
+
+  // Anchors arrive sorted from the API, but defensive-sort in case.
+  const sorted = [...versions].sort((a, b) => a.at - b.at);
+  const n = sorted.length;
+
+  // Out-of-range clamps to the endpoints.
+  if (intensity <= sorted[0].at) return sorted[0].text;
+  if (intensity >= sorted[n - 1].at) return sorted[n - 1].text;
+
+  // Find the bracket.
+  let lower = sorted[0];
+  let upper = sorted[n - 1];
+  for (let i = 0; i < n - 1; i++) {
+    if (sorted[i].at <= intensity && sorted[i + 1].at >= intensity) {
+      lower = sorted[i];
+      upper = sorted[i + 1];
+      break;
+    }
+  }
+
+  // Sitting exactly on an anchor — return that voice verbatim, no blend.
+  if (intensity === lower.at) return lower.text;
+  if (intensity === upper.at) return upper.text;
+
+  const span = upper.at - lower.at;
+  const t = span > 0 ? (intensity - lower.at) / span : 0;
+  return blendSentences(lower.text, upper.text, t);
+}
+
+/**
+ * Sentence-level blend between two texts. Picks whole sentences from one
+ * source or the other based on a low-discrepancy threshold — eliminates the
+ * repeated-word artifacts a word-interleave would produce.
+ */
+function blendSentences(a: string, b: string, p: number): string {
+  if (p <= 0) return a;
+  if (p >= 1) return b;
+  const aSents = splitSentences(a);
+  const bSents = splitSentences(b);
+  const n = Math.max(aSents.length, bSents.length);
   const PHI = 0.6180339887498949;
   const out: string[] = [];
   for (let i = 0; i < n; i++) {
     const r = ((i + 1) * PHI) % 1;
-    const useUnhinged = r < eased;
-    const src = useUnhinged ? uSents : vSents;
+    const useB = r < p;
+    const src = useB ? bSents : aSents;
     const idx = Math.min(src.length - 1, i);
     out.push(src[idx] ?? "");
   }

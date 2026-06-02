@@ -8,30 +8,47 @@ export const dynamic = "force-dynamic";
 const MODEL = "claude-haiku-4-5";
 const MAX_INPUT_CHARS = 6000;
 
-const SYSTEM_PROMPT = `You are vanillizator, a crypto text engine. You take a user's input and return TWO rewrites of the same content as JSON.
+// Canonical anchor points the slider interpolates between. Keep in sync with
+// the prompt below — every value here must appear in the model's response.
+const ANCHOR_ATS = [0, 15, 30, 50, 65, 85, 100] as const;
 
-Return ONLY a single JSON object, no prose, no markdown fences, with exactly these keys:
+const SYSTEM_PROMPT = `You are vanillizator, a crypto text engine. You receive a user's text and return 7 rewrites at different "degen intensity" voices, from corporate-clean to terminally-online.
+
+Return ONLY a single JSON object, no prose, no markdown fences, with exactly this shape:
 {
-  "vanilla": "<clean, professional version>",
-  "unhinged": "<4am crypto degen version>"
+  "versions": [
+    { "at": 0,   "text": "<pure vanilla rewrite>" },
+    { "at": 15,  "text": "<LinkedIn voice rewrite>" },
+    { "at": 30,  "text": "<group chat voice rewrite>" },
+    { "at": 50,  "text": "<caramelized: lowercase with light crypto seasoning>" },
+    { "at": 65,  "text": "<crypto twitter voice rewrite>" },
+    { "at": 85,  "text": "<posting through it: chaotic, lots of typos>" },
+    { "at": 100, "text": "<unhinged AF: maximum 4am degen energy>" }
+  ]
 }
 
-VANILLA:
-- Clean, clear, professional. The kind of copy a serious project or a comms team would ship.
-- Correct grammar, proper capitalization and punctuation.
-- Neutral-to-confident tone. No slang.
+THE 7 VOICES, in order:
 
-UNHINGED:
-- 4am crypto degen energy. Heavy crypto/CT slang (gm, ser, ngmi, wagmi, fren, anon, bags, send it, ape, cooked, locked in, etc.) used naturally, not stuffed.
-- all lowercase.
-- deliberate typos and sloppy spacing are good. keyboard-mashing energy but still readable.
-- NEVER use em-dashes or en-dashes. use commas, periods, or just run-ons.
-- unfiltered, overcaffeinated, terminally online.
+at 0 - PURE VANILLA: comms-team copy. Proper grammar, full capitalization, neutral confident tone. Like a press release headline.
 
-CRITICAL RULES FOR BOTH:
-- Keep every factual claim TRUE to the input. Do not invent numbers, names, dates, partnerships, or promises. Tone changes, facts do not.
-- Roughly preserve the meaning and length of the original.
-- Do not add disclaimers or commentary about the task.`;
+at 15 - LINKEDIN: polished but slightly more contemporary. Full capitalization preserved. Like a LinkedIn announcement post by a founder. Maybe one emoji.
+
+at 30 - GROUP CHAT: all-lowercase. Casual texting energy. Like messaging a coworker after work. Mild contemporary phrasing. No crypto-specific slang yet.
+
+at 50 - CARAMELIZED: all-lowercase. Light crypto seasoning ("gm" or "ser" sprinkled in once, maybe twice). Still readable. Casual with a clear degen hint. This is where vanilla meets crypto.
+
+at 65 - CRYPTO TWITTER: all-lowercase, multiple CT terms used naturally ("ser", "wagmi", "ngmi", "fren", "ape", "lfg", "bags"). Tweet-style brevity, dropped articles, "we're so back" energy.
+
+at 85 - POSTING THROUGH IT: chaotic. Deliberate typos. "lets goooo", repeated punctuation, vowel stretching, keyboard-mashing energy. Still readable but feels intoxicated. Some random ALL CAPS for emphasis.
+
+at 100 - UNHINGED AF: peak 4am degen. Heavy typos, mashed-together words, random ALL CAPS, crypto slang stuffed in. Maximum chaos while still being a coherent rewrite of the original.
+
+CRITICAL RULES FOR ALL VERSIONS:
+- Keep every factual claim TRUE to the input. Numbers, names, dates, partnerships, percentages, promises: do not invent or alter any of them. Voice changes, facts do not.
+- Each version should preserve approximate length (within ±30% of the input).
+- NEVER use em-dashes or en-dashes in any version. Use commas, periods, semicolons, or parentheses.
+- Each version must be visibly distinct from its neighbors in voice and vocabulary. A user sliding through them should clearly feel the gradient.
+- No disclaimers, no commentary, no markdown fences, no preamble. Just the JSON object.`;
 
 export async function POST(req: Request) {
   const apiKey = process.env.ANTHROPIC_API_KEY;
@@ -66,20 +83,18 @@ export async function POST(req: Request) {
   try {
     const response = await client.messages.create({
       model: MODEL,
-      max_tokens: 2048,
+      max_tokens: 3072, // 7 versions of typical input — usually ~1.2K, headroom for long inputs
       system: [
         {
           type: "text",
           text: SYSTEM_PROMPT,
-          // Caches the system prefix once it crosses the model's minimum size;
-          // a no-op below that, but keeps the call cache-ready as the prompt grows.
-          cache_control: { type: "ephemeral" },
+          cache_control: { type: "ephemeral" }, // system prompt is stable, eligible to cache
         },
       ],
       messages: [
         {
           role: "user",
-          content: `Rewrite the following text. Return only the JSON object.\n\n<text>\n${text}\n</text>`,
+          content: `Rewrite the following text at the 7 intensity levels. Return only the JSON object with all 7 versions.\n\n<text>\n${text}\n</text>`,
         },
       ],
     });
@@ -91,37 +106,45 @@ export async function POST(req: Request) {
       .trim();
 
     const parsed = extractJson(raw);
-    if (!parsed || typeof parsed.vanilla !== "string" || typeof parsed.unhinged !== "string") {
+    if (!parsed || !Array.isArray(parsed.versions)) {
       return NextResponse.json(
         { error: "The model returned an unexpected response. Please try again." },
         { status: 502 }
       );
     }
 
-    return NextResponse.json({
-      vanilla: parsed.vanilla.trim(),
-      unhinged: parsed.unhinged.trim(),
-    });
+    // Verify every anchor came back. Re-order by `at` so the slider can rely
+    // on monotonic ordering when finding adjacent anchors.
+    const versions: Array<{ at: number; text: string }> = [];
+    for (const at of ANCHOR_ATS) {
+      const v = parsed.versions.find(
+        (x) => typeof x === "object" && x !== null && (x as { at?: unknown }).at === at
+      ) as { at: number; text?: unknown } | undefined;
+      if (!v || typeof v.text !== "string" || !v.text.trim()) {
+        return NextResponse.json(
+          { error: `The model skipped intensity ${at}. Please try again.` },
+          { status: 502 }
+        );
+      }
+      versions.push({ at, text: v.text.trim() });
+    }
+
+    return NextResponse.json({ versions });
   } catch (err) {
     if (err instanceof Anthropic.APIError) {
       const status = err.status && err.status >= 400 && err.status < 600 ? err.status : 502;
-      return NextResponse.json(
-        { error: `Upstream error: ${err.message}` },
-        { status }
-      );
+      return NextResponse.json({ error: `Upstream error: ${err.message}` }, { status });
     }
     return NextResponse.json({ error: "Something went wrong. Please try again." }, { status: 500 });
   }
 }
 
-// Pull the first balanced JSON object out of the model's text response.
-function extractJson(s: string): { vanilla?: unknown; unhinged?: unknown } | null {
+function extractJson(s: string): { versions?: unknown } | null {
   const start = s.indexOf("{");
   const end = s.lastIndexOf("}");
   if (start === -1 || end === -1 || end <= start) return null;
-  const slice = s.slice(start, end + 1);
   try {
-    return JSON.parse(slice);
+    return JSON.parse(s.slice(start, end + 1));
   } catch {
     return null;
   }
